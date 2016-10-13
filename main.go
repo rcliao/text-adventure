@@ -12,6 +12,7 @@ import (
 
 func init() {
 	// TODO: initialize the state tree with random rooms
+	GenerateStateTree()
 }
 
 func main() {
