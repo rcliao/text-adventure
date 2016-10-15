@@ -6,7 +6,6 @@ package main
 
 import (
 	"log"
-	"math/rand"
 	"net/http"
 )
 
@@ -16,11 +15,10 @@ func init() {
 }
 
 func main() {
-	rand.Seed(460)
-
 	mux := http.NewServeMux()
 
 	mux.Handle("/healthcheck", HandleHealthCheck())
+	mux.Handle("/states", HandleShowAllStates())
 
 	log.Println("Server running at port 9000")
 

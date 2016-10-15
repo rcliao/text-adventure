@@ -1,17 +1,19 @@
 package main
 
+import "math/rand"
+
 // State represent each state in the text-adventure game
 type State struct {
-	ID       string   `json:"id"`
-	Location Location `json:"location"`
-	Hero     Hero     `json:"hero"`
+	ID        string   `json:"id"`
+	Location  Location `json:"location"`
+	Hero      Hero     `json:"hero"`
+	Neighbors []State  `json:"neighbors"`
 }
 
 // Location present location with its name and description
 type Location struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Event       Event  `json:"event"`
+	Name  string `json:"name"`
+	Event Event  `json:"event"`
 }
 
 /**
@@ -29,21 +31,29 @@ type EventChance struct {
 	Chance int
 }
 
+var locationNames = []string{
+	"Dark Room",
+	"Room with cage",
+	"Hall Way",
+	"Chamber",
+	"Dire Tombs",
+	"Empty Room",
+}
 var locationEventsMap = map[string][]EventChance{
 	"Dark Room": {
-		EventChance{
-			Event{
-				"Darkness wispers",
-				"You heard a wisper from the darkness. It drives you insane",
-				-10,
-			},
-			20,
-		},
 		EventChance{
 			Event{
 				"Loot",
 				"You quicky loot the deadbody. Hey, there is still remaining healing potion!",
 				20,
+			},
+			10,
+		},
+		EventChance{
+			Event{
+				"Darkness wispers",
+				"You heard a wisper from the darkness. It drives you insane",
+				-10,
 			},
 			30,
 		},
@@ -51,9 +61,9 @@ var locationEventsMap = map[string][]EventChance{
 			Event{
 				"Sleeping dwarve strike",
 				"Turns out lump was a dwarf sleeping. He strikes and attacks you!",
-				-20,
+				-30,
 			},
-			40,
+			50,
 		},
 		EventChance{
 			Event{
@@ -69,9 +79,9 @@ var locationEventsMap = map[string][]EventChance{
 			Event{
 				"Treasure",
 				"You found a healing potion in the cage!",
-				+20,
+				20,
 			},
-			20,
+			10,
 		},
 		EventChance{
 			Event{
@@ -79,7 +89,7 @@ var locationEventsMap = map[string][]EventChance{
 				"Besides the corpse, there is another hobgolbin hiding at the corner!",
 				-20,
 			},
-			30,
+			40,
 		},
 		EventChance{
 			Event{
@@ -95,17 +105,17 @@ var locationEventsMap = map[string][]EventChance{
 			Event{
 				"Shattered hallway",
 				"Hall starts to shatter ... rocks are falling!",
-				-20,
+				-30,
 			},
-			10,
+			30,
 		},
 		EventChance{
 			Event{
 				"Skeleton warrior",
 				"A skeleton warrior approaches you ... with a sword and shield.",
-				-10,
+				-30,
 			},
-			20,
+			40,
 		},
 		EventChance{
 			Event{
@@ -119,20 +129,77 @@ var locationEventsMap = map[string][]EventChance{
 	"Chamber": {
 		EventChance{
 			Event{
-				""
-			}
+				"Orge smash!",
+				"An orge smashes you with his hammer!",
+				-30,
+			},
+			30,
+		},
+		EventChance{
+			Event{
+				"Centaurs!",
+				"Centaurs stings you!",
+				-50,
+			},
+			30,
+		},
+		EventChance{
+			Event{
+				"Idle",
+				"Nothing happens",
+				0,
+			},
+			100,
+		},
+	},
+	"Dire Tombs": {
+		EventChance{
+			Event{
+				"Spectre darins",
+				"A spectre appears and start darining your soul.",
+				-20,
+			},
+			30,
+		},
+		EventChance{
+			Event{
+				"Zombie attack",
+				"At the corner, there is a zombie slowly approaches.",
+				-20,
+			},
+			40,
+		},
+		EventChance{
+			Event{
+				"Idle",
+				"Nohting happens",
+				0,
+			},
+			100,
 		},
 	},
 	"Empty Room": {
-
+		EventChance{
+			Event{
+				"Idle",
+				"Nohting happnes",
+				0,
+			},
+			100,
+		},
 	},
-	"Dire Tombs": {},
 }
 
 // NewLocation is a constructor pattern to generate location with random chance imported
-func NewLocation(name, description string) *Location {
-	event := Event{"test", "test event", -20}
-	return &Location{name, description, event}
+func NewLocation(name string) *Location {
+	var event Event
+	for i := 0; i < len(locationEventsMap[name]); i++ {
+		if rand.Intn(100) < locationEventsMap[name][i].Chance {
+			event = locationEventsMap[name][i].Event
+			break
+		}
+	}
+	return &Location{name, event}
 }
 
 // Hero is the player!

@@ -18,3 +18,12 @@ func HandleHealthCheck() http.Handler {
 		json.NewEncoder(w).Encode(&healthCheck{true})
 	})
 }
+
+// HandleShowAllStates is internal state testing
+func HandleShowAllStates() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(states)
+	})
+}
