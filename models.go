@@ -13,7 +13,7 @@ type State struct {
 // Location present location with its name and description
 type Location struct {
 	Name  string `json:"name"`
-	Event Event  `json:"event"`
+	Event Event  `json:"-"`
 }
 
 /**
@@ -214,9 +214,9 @@ type Event struct {
 	Effect      int    `json:"effect"`
 }
 
-// NewEvent is a constructor for event
-func NewEvent(name string, description string, effect int) *Event {
-	return &Event{name, description, effect}
+// Action indicate a state trasition model
+type Action struct {
+	ID     string `json:"id"`
+	Action string `json:"action"`
+	Event  Event  `json:"event"`
 }
-
-// TODO: generate a list of events
