@@ -18,7 +18,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.Handle("/healthcheck", HandleHealthCheck())
-	// mux.Handle("/states", HandleShowAllStates())
+	mux.Handle("/states", HandleShowAllStates())
 	mux.Handle("/getState", HandleGetState())
 	mux.Handle("/state", HandleStateTransition())
 
