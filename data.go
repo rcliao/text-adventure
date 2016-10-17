@@ -14,14 +14,14 @@ var states []State
 func GenerateStateTree() {
 	rand.Seed(4660)
 
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 1000; i++ {
 		currentState := createState(i)
 		states = append(states, currentState)
 	}
 
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 1000; i++ {
 		currentState := &states[i]
-		for j := 0; j < rand.Intn(10); j++ {
+		for j := 0; j < rand.Intn(20); j++ {
 			randomNeighborIndex := rand.Intn(len(states))
 			for randomNeighborIndex == i {
 				randomNeighborIndex = rand.Intn(len(states))
