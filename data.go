@@ -7,12 +7,12 @@ import (
 	"strconv"
 )
 
-var salt = "CS-4660-fall-2016-" + strconv.Itoa(rand.Intn(460))
+var salt = "CS-4660-fall-2017-" + strconv.Itoa(rand.Intn(460))
 var states []State
 
 // GenerateStateTree is the function to generate all mock data
 func GenerateStateTree() {
-	rand.Seed(4660)
+	rand.Seed(201713374660)
 
 	for i := 0; i < 1000; i++ {
 		currentState := createState(i)
