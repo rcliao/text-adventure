@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	model "github.com/rcliao/text-adventure/models"
 )
@@ -18,6 +19,8 @@ var toState = flag.String("to", "", "from state id")
 var serverURL = "http://192.241.218.106:9000"
 var stateAPI = serverURL + "/getState"
 var transitionAPI = serverURL + "/state"
+
+var emptyItem = Item{}
 
 func main() {
 	flag.Parse()
@@ -48,11 +51,13 @@ func main() {
 		for _, n := range c.Neighbors {
 			neighborState := getState(n.ID)
 			action := getTransition(c.ID, n.ID)
-			g.AddEdge(Edge{
+			edge := Edge{
 				FromNode: node,
 				ToNode:   Node{Data{neighborState.ID, neighborState.Location.Name}},
 				Weight:   action.Event.Effect,
-			})
+			}
+			g.AddEdge(edge)
+			fmt.Println("Adding edge", edge)
 			if checkExist(exploredRoom, neighborState) || checkExist(openSet, neighborState) {
 				continue
 			}
@@ -63,10 +68,10 @@ func main() {
 	fromNode := Node{Data{*fromState, "Empty Room"}}
 	toNode := Node{Data{*toState, "Dark Room"}}
 	bfs := search(func(g Graph, n1, n2 Node) int { return 1 })
-	dijkstra := search(func(g Graph, n1, n2 Node) int { return g.Distance(n1, n2) })
+	dijkstra := search(func(g Graph, n1, n2 Node) int { return g.Distance(n1, n2) * -1 })
 
-	fmt.Println(bfs(g, fromNode, toNode))
-	fmt.Println(dijkstra(g, fromNode, toNode))
+	fmt.Println("BFS:\n", prettyPrintEdges(bfs(g, fromNode, toNode)))
+	fmt.Println("Dijkstra:\n", prettyPrintEdges(dijkstra(g, fromNode, toNode)))
 }
 
 func checkExist(rooms []model.State, room model.State) bool {
@@ -131,6 +136,8 @@ func request(url string, body *bytes.Buffer) (*http.Response, error) {
 type Node struct {
 	Data Data
 }
+
+// Data is DTO (Data Transfer Object) wrapping the state and room name
 type Data struct {
 	ID   string
 	Name string
@@ -165,6 +172,7 @@ func search(getDistance func(g Graph, n1, n2 Node) int) Search {
 		frontier := make(PriorityQueue, 1)
 		parents := make(map[Node]Node)
 		distances := make(map[Node]float64)
+		explored := []Node{}
 
 		frontier[0] = &Item{
 			value:    fromNode,
@@ -177,23 +185,29 @@ func search(getDistance func(g Graph, n1, n2 Node) int) Search {
 
 		for frontier.Len() > 0 {
 			current := heap.Pop(&frontier).(*Item).value
+			explored = append(explored, current)
 
 			if current == toNode {
 				// found solution
-				return backTrack(parents, current)
+				return backTrack(graph, parents, current)
 			}
 
 			for _, n := range graph.Neighbors(current) {
 				newCost := distances[current] + float64(getDistance(graph, current, n))
 				if _, okay := distances[n]; !okay || newCost < distances[n] {
-					priority := float64(newCost)
-					if frontier.Contains(n) {
+					priority := newCost
+					if containsNode(explored, n) {
 						continue
 					}
-					heap.Push(&frontier, &Item{
+					item := &Item{
 						value:    n,
 						priority: priority,
-					})
+					}
+					if existingItem := frontier.Contains(n); *existingItem != emptyItem {
+						frontier.update(existingItem, item.value, priority)
+					} else {
+						heap.Push(&frontier, item)
+					}
 					distances[n] = newCost
 					parents[n] = current
 				}
@@ -204,14 +218,24 @@ func search(getDistance func(g Graph, n1, n2 Node) int) Search {
 	}
 }
 
-func backTrack(parents map[Node]Node, current Node) []Edge {
+func containsNode(nodes []Node, node Node) bool {
+	for _, n := range nodes {
+		if n == node {
+			return true
+		}
+	}
+
+	return false
+}
+
+func backTrack(graph Graph, parents map[Node]Node, current Node) []Edge {
 	edges := []Edge{}
 	c := current
 	emptyNode := Node{}
 
 	for c != emptyNode {
 		parent := parents[c]
-		edge := Edge{parent, c, 1}
+		edge := Edge{parent, c, graph.Distance(parent, c)}
 		edges = append(edges, edge)
 		c = parent
 	}
@@ -227,4 +251,20 @@ func reverse(ss []Edge) {
 	for i := 0; i < len(ss)/2; i++ {
 		ss[i], ss[last-i] = ss[last-i], ss[i]
 	}
+}
+
+func prettyPrintEdges(edges []Edge) string {
+	result := ""
+	hp := 0
+
+	for _, edge := range edges {
+		result += edge.FromNode.Data.Name + "(" + edge.FromNode.Data.ID + ")" +
+			":" + edge.ToNode.Data.Name + "(" + edge.ToNode.Data.ID + ")" +
+			":" + strconv.Itoa(edge.Weight) + "\n"
+		hp += edge.Weight
+	}
+
+	result += "hp:" + strconv.Itoa(hp)
+
+	return result
 }

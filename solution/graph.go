@@ -87,6 +87,7 @@ func (g *AdjacencyList) RemoveEdge(edge Edge) bool {
 	return true
 }
 
+// Distance returns the edge weight between two nodes (only if they are adjacent) or returns zero if not
 func (g *AdjacencyList) Distance(n1, n2 Node) int {
 	if !g.checkNodeExist(n1) || !g.checkNodeExist(n2) {
 		return 0

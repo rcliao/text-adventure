@@ -17,7 +17,7 @@ func (pq PriorityQueue) Len() int { return len(pq) }
 
 func (pq PriorityQueue) Less(i, j int) bool {
 	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
-	return pq[i].priority > pq[j].priority
+	return pq[i].priority < pq[j].priority
 }
 
 func (pq PriorityQueue) Swap(i, j int) {
@@ -42,13 +42,13 @@ func (pq *PriorityQueue) Pop() interface{} {
 	return item
 }
 
-func (pq *PriorityQueue) Contains(n Node) bool {
+func (pq *PriorityQueue) Contains(n Node) *Item {
 	for _, item := range *pq {
 		if item.value == n {
-			return true
+			return item
 		}
 	}
-	return false
+	return &Item{}
 }
 
 // update modifies the priority and value of an Item in the queue.
