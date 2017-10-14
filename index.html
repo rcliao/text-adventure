@@ -31,8 +31,12 @@
                 <input id="search" type="text">
             </div>
             <button id="search_button">Search</button>
-            <ul>
-            </ul>
+
+            <div class="input-conatiner">
+                <label for="path">Path:</label>
+                <textarea id="path" name="" cols="30" rows="10"></textarea>
+            </div>
+            <button id="animate_button">Animate</button>
         </div>
     </main>
 
@@ -57,6 +61,7 @@
                 });
             });
             var nodeIDInput = document.getElementById('search');
+            var pathInput = document.getElementById('path');
             // Let's first initialize sigma:
             var s = new sigma({
                 renderers: [
@@ -70,6 +75,7 @@
                 minArrowSize: 5,
                 minEdgeSize: 0,
                 maxEdgeSize: 3,
+                borderSize: 2,
             });
             s.bind('clickNode', function(e) {
                 console.log(e)
@@ -134,10 +140,57 @@
                         }
                     });
                 });
+            var animateTimeout, nodes, currentNode;
+            document.getElementById('animate_button')
+                .addEventListener('click', () => {
+                    nodes = pathInput.value.split('\n');
+                    console.log(nodes);
+                    playAnimate(0);
+                });
+
+            function playAnimate(step) {
+                animateTimeout = setTimeout(() => {
+                    if (step < nodes.length) {
+                        highlight(nodes[step], currentNode);
+                        currentNode = nodes[step];
+                        playAnimate(step+1);
+                    }
+                }, 1000);
+            }
+            function highlight(toNode, fromNode) {
+                var highlightedNodes = [];
+                s.graph.nodes()
+                    .forEach(n => {
+                        if (n.id === toNode || n.id === fromNode) {
+                            n.color = '#f00';
+                            highlightedNodes.push(n);
+                        } else {
+                            n.color = nodeColors[n.name];
+                        }
+                    });
+                if (fromNode) {
+                    s.graph.edges()
+                        .forEach(e => {
+                            if (e.source === fromNode && e.target === toNode) {
+                                e.color = '#f00';
+                                e.zIndex = 1;
+                            } else {
+                                e.color = '#eee';
+                                e.zIndex = 0;
+                            }
+                        });
+                }
+                highlightedNodes.forEach(n => {
+                    s.dispatchEvent('overNode', n);
+                });
+                s.graph.orderEdges();
+                s.refresh();
+            }
 
             function addNode (g, state, nodeColors) {
                 g.addNode({
                     id: state.id,
+                    name: state.location.name,
                     label: state.location.name + '-' + state.id,
                     x: state.location.x,
                     y: state.location.y,
