@@ -16,7 +16,7 @@ import (
 var fromState = flag.String("from", "", "from state id")
 var toState = flag.String("to", "", "from state id")
 
-var serverURL = "http://192.241.218.106:9000"
+var serverURL = "http://localhost:9000"
 var stateAPI = serverURL + "/getState"
 var transitionAPI = serverURL + "/state"
 

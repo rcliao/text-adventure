@@ -56,6 +56,7 @@
                     return 0;
                 });
             });
+            var nodeIDInput = document.getElementById('search');
             // Let's first initialize sigma:
             var s = new sigma({
                 renderers: [
@@ -72,6 +73,7 @@
             });
             s.bind('clickNode', function(e) {
                 console.log(e)
+                nodeIDInput.value = e.data.node.id;
                 s.graph.edges().forEach(edge => {
                     if (edge.source === e.data.node.id) {
                         edge.color = '#f00';
@@ -87,7 +89,7 @@
                 s.refresh();
             });
             var counter = 0;
-            fetch('/states')
+            fetch('/secret/states')
                 .then(resp => {
                     return resp.json();
                 })
@@ -123,7 +125,6 @@
                     s.refresh();
                 });
 
-            var nodeIDInput = document.getElementById('search');
             document.getElementById('search_button')
                 .addEventListener('click', () => {
                     var nodeID = nodeIDInput.value;
@@ -138,8 +139,8 @@
                 g.addNode({
                     id: state.id,
                     label: state.location.name + '-' + state.id,
-                    x: Math.random(),
-                    y: Math.random(),
+                    x: state.location.x,
+                    y: state.location.y,
                     size: 0.2 + Math.random(),
                     color: nodeColors[state.location.name],
                 });

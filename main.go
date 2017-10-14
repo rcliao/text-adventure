@@ -19,12 +19,12 @@ func init() {
 func main() {
 	r := mux.NewRouter()
 
-	r.Handle("/", Index()).Methods("GET")
+	r.Handle("/secret", Index()).Methods("GET")
+	r.Handle("/secret/states", HandleShowAllStates()).Methods("GET")
+	r.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("./static"))))
 	r.Handle("/healthcheck", HandleHealthCheck()).Methods("GET")
-	r.Handle("/states", HandleShowAllStates()).Methods("GET")
 	r.Handle("/getState", HandleGetState()).Methods("POST")
 	r.Handle("/state", HandleStateTransition()).Methods("POST")
-	r.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("./static"))))
 
 	log.Println("Server running at port 9000")
 

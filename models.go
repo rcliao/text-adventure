@@ -11,8 +11,10 @@ type State struct {
 
 // Location present location with its name and description
 type Location struct {
-	Name  string `json:"name"`
-	Event Event  `json:"-"`
+	X     float64 `json:"x"`
+	Y     float64 `json:"y"`
+	Name  string  `json:"name"`
+	Event Event   `json:"-"`
 }
 
 // EventChance is to wrap the event with the chances
@@ -198,7 +200,7 @@ func NewLocation(name string) *Location {
 			break
 		}
 	}
-	return &Location{name, event}
+	return &Location{rand.Float64(), rand.Float64(), name, event}
 }
 
 // Hero is the player!
