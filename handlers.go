@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"net/http"
 )
 
@@ -16,6 +17,16 @@ func HandleHealthCheck() http.Handler {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(&healthCheck{true})
+	})
+}
+
+func Index() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t, err := template.ParseFiles("./index.html")
+		if err != nil {
+			panic(err)
+		}
+		t.Execute(w, nil)
 	})
 }
 
@@ -67,6 +78,7 @@ func HandleStateTransition() http.Handler {
 		}
 		if &nextID == nil {
 			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 		nextState = findState(nextID)
 

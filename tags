@@ -1,0 +1,49 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/924c0ab/
+Action	models.go	/^	Action string `json:"action"`$/;"	m	struct:main.Action
+Action	models.go	/^type Action struct {$/;"	s	package:main
+Alive	handlers.go	/^	Alive bool `json:"alive"`$/;"	m	struct:main.healthCheck
+Chance	models.go	/^	Chance int$/;"	m	struct:main.EventChance
+Description	models.go	/^	Description string `json:"description"`$/;"	m	struct:main.Event
+Effect	models.go	/^	Effect      int    `json:"effect"`$/;"	m	struct:main.Event
+Event	models.go	/^	Event  Event  `json:"event"`$/;"	m	struct:main.Action
+Event	models.go	/^	Event  Event$/;"	m	struct:main.EventChance
+Event	models.go	/^	Event Event  `json:"-"`$/;"	m	struct:main.Location
+Event	models.go	/^type Event struct {$/;"	s	package:main
+EventChance	models.go	/^type EventChance struct {$/;"	s	package:main
+GenerateStateTree	data.go	/^func GenerateStateTree() {$/;"	f	package:main
+HP	models.go	/^	HP int `json:"hp"`$/;"	m	struct:main.Hero
+HandleGetState	handlers.go	/^func HandleGetState() http.Handler {$/;"	f	package:main
+HandleHealthCheck	handlers.go	/^func HandleHealthCheck() http.Handler {$/;"	f	package:main
+HandleShowAllStates	handlers.go	/^func HandleShowAllStates() http.Handler {$/;"	f	package:main
+HandleStateTransition	handlers.go	/^func HandleStateTransition() http.Handler {$/;"	f	package:main
+Hero	models.go	/^type Hero struct {$/;"	s	package:main
+ID	models.go	/^	ID        string   `json:"id"`$/;"	m	struct:main.State
+ID	models.go	/^	ID     string `json:"id"`$/;"	m	struct:main.Action
+Location	models.go	/^	Location  Location `json:"location"`$/;"	m	struct:main.State
+Location	models.go	/^type Location struct {$/;"	s	package:main
+Name	models.go	/^	Name        string `json:"name"`$/;"	m	struct:main.Event
+Name	models.go	/^	Name  string `json:"name"`$/;"	m	struct:main.Location
+Neighbors	models.go	/^	Neighbors []State  `json:"neighbors"`$/;"	m	struct:main.State
+NewLocation	models.go	/^func NewLocation(name string) *Location {$/;"	f	package:main
+State	models.go	/^type State struct {$/;"	s	package:main
+createState	data.go	/^func createState(id int) State {$/;"	f	package:main
+findState	handlers.go	/^func findState(ID string) State {$/;"	f	package:main
+getMD5Hash	data.go	/^func getMD5Hash(text string) string {$/;"	f	package:main
+healthCheck	handlers.go	/^type healthCheck struct {$/;"	s	package:main
+init	main.go	/^func init() {$/;"	f	package:main
+locationDescriptionMap	models.go	/^var locationDescriptionMap = map[string]string{$/;"	v	package:main
+locationEventsMap	models.go	/^var locationEventsMap = map[string][]EventChance{$/;"	v	package:main
+locationNames	models.go	/^var locationNames = []string{$/;"	v	package:main
+main	data.go	/^package main$/;"	p
+main	handlers.go	/^package main$/;"	p
+main	main.go	/^func main() {$/;"	f	package:main
+main	main.go	/^package main$/;"	p
+main	models.go	/^package main$/;"	p
+salt	data.go	/^var salt = "CS-4660-fall-2016-" + strconv.Itoa(rand.Intn(460))$/;"	v	package:main
+states	data.go	/^var states []State$/;"	v	package:main
