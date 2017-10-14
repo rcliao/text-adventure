@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text Adventure State Visualization</title>
+    <style>
+        main {
+            width: 80em;
+            margin: 0 auto;
+            display: flex;
+        }
+        .control-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #container {
+            width: 70em;
+            height: 95vh;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div id="container"></div>
+        <div class="control-form">
+            <div class="input-container">
+                <label for="search">Node ID:</label>
+                <input id="search" type="text">
+            </div>
+            <button id="search_button">Search</button>
+            <ul>
+            </ul>
+        </div>
+    </main>
+
+    <script src="static/sigma.js"></script>
+    <script>
+        (function() {
+            var nodeColors = {
+                'Dark Room': '#333',
+                'Room with cage': '#3ff',
+                'Hall Way': '#3f3',
+                'Chamber': '#33f',
+                'Dire Tombs': '#ff3',
+                'Empty Room': '#f3f',
+            };
+            sigma.classes.graph.addMethod('orderEdges', function() {
+                this.edgesArray.sort((a, b) => {
+                    if(a.zIndex < b.zIndex)
+                        return -1;
+                    if(a.zIndex > b.zIndex)
+                        return 1;
+                    return 0;
+                });
+            });
+            // Let's first initialize sigma:
+            var s = new sigma({
+                renderers: [
+                    {
+                        container: document.getElementById('container'),
+                        type: 'canvas' // sigma.renderers.canvas works as well
+                    }
+                ]
+            });
+            s.settings({
+                minArrowSize: 5,
+                minEdgeSize: 0,
+                maxEdgeSize: 3,
+            });
+            s.bind('clickNode', function(e) {
+                console.log(e)
+                s.graph.edges().forEach(edge => {
+                    if (edge.source === e.data.node.id) {
+                        edge.color = '#f00';
+                        edge.size = 5;
+                        edge.zIndex = 1;
+                    } else {
+                        edge.color = '#eee';
+                        edge.size = 0;
+                        edge.zIndex = 0;
+                    }
+                });
+                s.graph.orderEdges();
+                s.refresh();
+            });
+            var counter = 0;
+            fetch('/states')
+                .then(resp => {
+                    return resp.json();
+                })
+                .then(states => {
+                    states.forEach(state => {
+                        nodeExists = s.graph.nodes()
+                            .find(node => node.id === state.id);
+                        if (!nodeExists) {
+                            addNode(s.graph, state, nodeColors);
+                        }
+                        state.neighbors.forEach(n => {
+                            counter ++;
+                            nodes = s.graph.nodes();
+                            neighborExists = nodes
+                                .find(node => node.id === n.id);
+
+                            if (!neighborExists) {
+                                addNode(s.graph, n, nodeColors);
+                            }
+                            s.graph.addEdge({
+                                id: 'e' + counter,
+                                source: state.id,
+                                target: n.id,
+                                size: 0.5,
+                                type: 'arrow',
+                                color: '#ccc',
+                                hover_color: '#000',
+                            });
+                        });
+                    });
+                    console.log(s.graph.nodes());
+                    console.log(s.graph.edges());
+                    s.refresh();
+                });
+
+            var nodeIDInput = document.getElementById('search');
+            document.getElementById('search_button')
+                .addEventListener('click', () => {
+                    var nodeID = nodeIDInput.value;
+                    s.graph.nodes().forEach(n => {
+                        if (n.id == nodeID) {
+                            s.dispatchEvent('clickNode', {node: n});
+                        }
+                    });
+                });
+
+            function addNode (g, state, nodeColors) {
+                g.addNode({
+                    id: state.id,
+                    label: state.location.name + '-' + state.id,
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: 0.2 + Math.random(),
+                    color: nodeColors[state.location.name],
+                });
+            }
+        })()
+    </script>
+</body>
+</html>

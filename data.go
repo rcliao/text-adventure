@@ -13,15 +13,18 @@ var states []State
 // GenerateStateTree is the function to generate all mock data
 func GenerateStateTree() {
 	rand.Seed(201713374660)
+	numOfNodes := 100
+	minEdges := 3
+	maxEdges := 17
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < numOfNodes; i++ {
 		currentState := createState(i)
 		states = append(states, currentState)
 	}
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < numOfNodes; i++ {
 		currentState := &states[i]
-		for j := 0; j < rand.Intn(20); j++ {
+		for j := 0; j < minEdges+rand.Intn(maxEdges); j++ {
 			randomNeighborIndex := rand.Intn(len(states))
 			for randomNeighborIndex == i {
 				randomNeighborIndex = rand.Intn(len(states))

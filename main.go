@@ -7,6 +7,8 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func init() {
@@ -15,15 +17,17 @@ func init() {
 }
 
 func main() {
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 
-	mux.Handle("/healthcheck", HandleHealthCheck())
-	mux.Handle("/states", HandleShowAllStates())
-	mux.Handle("/getState", HandleGetState())
-	mux.Handle("/state", HandleStateTransition())
+	r.Handle("/", Index()).Methods("GET")
+	r.Handle("/healthcheck", HandleHealthCheck()).Methods("GET")
+	r.Handle("/states", HandleShowAllStates()).Methods("GET")
+	r.Handle("/getState", HandleGetState()).Methods("POST")
+	r.Handle("/state", HandleStateTransition()).Methods("POST")
+	r.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("./static"))))
 
 	log.Println("Server running at port 9000")
 
-	err := http.ListenAndServe(":9000", mux)
+	err := http.ListenAndServe(":9000", r)
 	log.Fatal(err)
 }
